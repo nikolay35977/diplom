@@ -6,11 +6,11 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+# My ignored
 /venv/
 /misc.xml
 /modules.xml
 /vcs.xml
-/.idea
+/.idea/
 /programs.iml
 /inspectionProfiles/
-/profiles_settings.xml
