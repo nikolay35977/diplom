@@ -1,7 +1,3 @@
-import xlrd
-import numpy as np
-import matplotlib.pyplot as plt
-import math
 import ParseFromExel
 
 
@@ -109,19 +105,32 @@ def find_max_payoff(payoff_matrix, route_array, block_array, q_array, Q):
                                 max_elem = 0
     return [max_elem_i, max_elem_j]
 
-def ClarkeWrightMethod(path, r, Q):
-    distance_matrix = ParseFromExel.parse_matrix_from_xls(path, r)
-    q_array = distance_matrix.pop()
+def check_route(route, all_route):
+    new_route = []
+    for i in range(0, len(route)):
+        for j in range(0, len(route[i])):
+            new_route.append(route[i][j])
+    return list(set(all_route) - set(new_route))
+
+def put_route(r):
+    array = []
+    c = 0
+    for i in range(r):
+        array.append(c)
+        c+=1
+    return array
+
+def ClarkeWrightMethod(q_array, distance_matrix, r, Q):
     payoff_matrix = fill_payoff_matrix(distance_matrix, r)
     route_array = []
     block_array = []
-    q_route = 0
-
+    all_route = put_route(r)
     while count_route(route_array) < r - 1:
         new_route = find_max_payoff(payoff_matrix, route_array, block_array, q_array, Q)
         new_route_array = []
         way_i = find_in_matrix(new_route[0], route_array)
         way_j = find_in_matrix(new_route[1], route_array)
+        print(check_route(route_array, all_route))
         if way_i != -1:
             if new_route[0] == route_array[way_i][0]:
                 route_array[way_i].insert(0, new_route[1])

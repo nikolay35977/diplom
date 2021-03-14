@@ -64,14 +64,15 @@ def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, 
         count_p = 0
         P = []
         for j in range(r):
-            if j not in block_track and distance_matrix[i][j] != 0 and q_track + q_array[j] < Q:
+            if j not in block_track and distance_matrix[i][j] != 0 and q_track + q_array[j] < Q and tau[i][j] >= 0:
                 nij = 1 / distance_matrix[i][j]
-                x = (pow(nij, betta) * pow(tau[i][j], alpha)) / variants
-                S += x
-                if x != 0:
-                    dict[count_p] = j
-                    P.append(S)
-                    count_p += 1
+                if variants != 0:
+                    x = (pow(nij, betta) * pow(tau[i][j], alpha)) / variants
+                    S += x
+                    if x != 0:
+                        dict[count_p] = j
+                        P.append(S)
+                        count_p += 1
         if len(P) == 0:
             InBase = True
             track.append(0)
@@ -113,64 +114,26 @@ def update_tau(tau, tracks, r, Q_ant, p, distance_matrix):
     return tau
 
 
-def AntAlgorithm2(path, r, Q):
-    distance_matrix = ParseFromExel.parse_matrix_from_xls(path, r)
-    q_array = distance_matrix.pop()
-    tau = fill_tau_matrix(r)
-    distance_matrix = fill_matrix(distance_matrix, r)
-    alpha = 1
-    betta = 1
-    block_track = []
-    p = 0.01
-    Q_ant = 0.01
-    tracks = ClarkeWrightMethod(path, r, Q)
-    tau = update_tau(tau, tracks, r, 0.1, p, distance_matrix)
-    tracks = []
-
-    while len(block_track) < r - 1:
-        track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
-        tracks.append(track[0])
-    tracks = []
-    for i in range(10000):
-        tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
-        block_track = []
-        tracks = []
-        while len(block_track) < r - 1:
-            track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
-            tracks.append(track[0])
-    return tracks
-
-
-def AntAlgorithm212(q_array, distance_matrix, r, Q):
+def AntAlgorithm2(q_array, distance_matrix, r, Q):
     tau = fill_tau_matrix(r)
     alpha = 1
     betta = 1
     block_track = []
     p = 0.01
     Q_ant = 0.01
+    #tracks = ClarkeWrightMethod(q_array, distance_matrix, r, Q)
+    #tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
     tracks = []
 
-    while len(block_track) < r - 1:
+    while len(block_track) < r:
         track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
         tracks.append(track[0])
     tracks = []
-    for i in range(10000):
+    for i in range(1000):
         tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
         block_track = []
         tracks = []
-        while len(block_track) < r - 1:
+        while len(block_track) < r:
             track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
             tracks.append(track[0])
     return tracks
-
-
-pathPoints = "Files/input3.xls"
-r = 121
-Q = 1.5
-keyWord = 'Адрес'
-qKeyWord = 'Документ задание.Вес брутто'
-distanceKeyWord = 'Расстояние'
-connectionsMatrix = ParseFromExel.make_points_dict(pathPoints, keyWord, r)
-q_array = ParseFromExel.make_q_array(pathPoints, qKeyWord, connectionsMatrix, r)
-distance_matrix = ParseFromExel.make_distance_matrix(pathPoints, distanceKeyWord, connectionsMatrix, r)
-print(AntAlgorithm212(q_array, distance_matrix, r, Q))

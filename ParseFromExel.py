@@ -91,7 +91,10 @@ def fill_zeros_matrix(r):
     for i in range(r):
         row = []
         for j in range(r):
-            row.append(0)
+            if i == j:
+                row.append(0)
+            else:
+                row.append(0)
         rows.append(row)
     return rows
 

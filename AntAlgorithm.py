@@ -64,12 +64,13 @@ def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, 
         for j in range(r):
             if j not in block_track and distance_matrix[i][j] != 0 and q_track + q_array[j] < Q:
                 nij = 1 / distance_matrix[i][j]
-                x = (pow(nij, betta) * pow(tau[i][j], alpha)) / variants
-                S += x
-                if x != 0:
-                    dict[count_p] = j
-                    P.append(S)
-                    count_p += 1
+                if variants != 0:
+                    x = (pow(nij, betta) * pow(tau[i][j], alpha)) / variants
+                    S += x
+                    if x != 0:
+                        dict[count_p] = j
+                        P.append(S)
+                        count_p += 1
         if len(P) == 0:
             hasSpace = False
         else:
@@ -98,7 +99,10 @@ def update_tau(tau, tracks, r, Q_ant, p, distance_matrix):
     for i in range(r):
         for j in range(r):
             if i != j:
-                del_tau = Q_ant / distance_matrix[i][j]
+                if distance_matrix[i][j] == 0:
+                    del_tau = 1
+                else:
+                    del_tau = Q_ant / distance_matrix[i][j]
                 if check_on_tracks(tracks, i, j):
                     tau[i][j] = tau[i][j] + del_tau
                 else:
@@ -106,12 +110,9 @@ def update_tau(tau, tracks, r, Q_ant, p, distance_matrix):
     return tau
 
 
-def AntAlgorithm(path, r, Q):
-    distance_matrix = ParseFromExel.parse_matrix_from_xls(path, r)
-    q_array = distance_matrix.pop()
+def AntAlgorithm(q_array, distance_matrix, r, Q):
     tracks = []
     tau = fill_tau_matrix(r)
-    distance_matrix = fill_matrix(distance_matrix, r)
     alpha = 1
     betta = 1
     block_track = [0]
@@ -122,12 +123,11 @@ def AntAlgorithm(path, r, Q):
         track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
         tracks.append(track[0])
 
-    for i in range(10000):
+    for i in range(1000):
         tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
         block_track = [0]
         tracks = []
         while len(block_track) < r:
             track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
             tracks.append(track[0])
-
     return tracks
