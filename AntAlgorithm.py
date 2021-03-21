@@ -124,6 +124,7 @@ def AntAlgorithm(q_array, distance_matrix, r, Q):
         tracks.append(track[0])
 
     for i in range(1000):
+        print(i)
         tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
         block_track = [0]
         tracks = []

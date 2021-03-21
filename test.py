@@ -20,16 +20,16 @@ x = check_length_track(x_t, distance_matrix)
 y_t = AntAlgorithm.AntAlgorithm(q_array, distance_matrix, r, Q)
 y = check_length_track(y_t, distance_matrix)
 
-for i in range(20):
+for i in range(1):
     AntAlgorithm2_T = AntAlgorithm2.AntAlgorithm2(q_array, distance_matrix, r, Q)
     AntAlgorithm2_C = check_length_track(AntAlgorithm2_T, distance_matrix)
     AntAlgorithm_T = AntAlgorithm.AntAlgorithm(q_array, distance_matrix, r, Q)
     AntAlgorithm_C = check_length_track(AntAlgorithm_T, distance_matrix)
-    if x < AntAlgorithm2_C:
+    if x > AntAlgorithm2_C:
         x = AntAlgorithm2_C
         x_t = AntAlgorithm2_T
         print('AntAlgorithm2: length: ', x, ' cars count: ', len(x_t), ' traks: ', x_t)
-    if y < AntAlgorithm_C:
+    if y > AntAlgorithm_C:
         y = AntAlgorithm_C
         y_t = AntAlgorithm_T
         print('AntAlgorithm: length: ', y, ' cars count: ', len(y_t), ' traks: ', y_t)

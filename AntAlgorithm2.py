@@ -113,6 +113,16 @@ def update_tau(tau, tracks, r, Q_ant, p, distance_matrix):
                     tau[i][j] = (1 - p) * tau[i][j] - del_tau
     return tau
 
+def check_route(route, all_route):
+    return list(set(all_route) - set(route))
+
+def put_route(r):
+    array = []
+    c = 0
+    for i in range(r):
+        array.append(c)
+        c+=1
+    return array
 
 def AntAlgorithm2(q_array, distance_matrix, r, Q):
     tau = fill_tau_matrix(r)
@@ -124,6 +134,7 @@ def AntAlgorithm2(q_array, distance_matrix, r, Q):
     #tracks = ClarkeWrightMethod(q_array, distance_matrix, r, Q)
     #tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
     tracks = []
+    all_route = put_route(r)
 
     while len(block_track) < r:
         track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
