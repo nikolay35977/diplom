@@ -92,9 +92,9 @@ def fill_zeros_matrix(r):
         row = []
         for j in range(r):
             if i == j:
-                row.append(0)
+                row.append(float('inf'))
             else:
-                row.append(0)
+                row.append(float('inf'))
         rows.append(row)
     return rows
 
