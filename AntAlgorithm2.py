@@ -2,6 +2,7 @@
 import ParseFromExel
 import random
 from ClarkeWrightMethod2 import ClarkeWrightMethod
+import time
 
 
 def print_matrix(matrix):
@@ -38,7 +39,7 @@ def fill_matrix(distance_matrix, r):
 def sum_variants(i, alpha, betta, distance_matrix, tau, r, tracks):
     S = 0
     for k in range(r):
-        if k not in tracks and distance_matrix[i][k] != 0:
+        if k not in tracks and distance_matrix[i][k] > 0:
             nij = 1 / distance_matrix[i][k]
             Xij = pow(nij, betta) * pow(tau[i][k], alpha)
             S += Xij
@@ -52,7 +53,7 @@ def find_random_in_array(array, x):
     return len(array) - 1
 
 
-def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q):
+def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q, timeout):
     q_track = 0
     InBase = False
     i = 0
@@ -63,6 +64,9 @@ def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, 
         variants = sum_variants(i, alpha, betta, distance_matrix, tau, r, block_track)
         count_p = 0
         P = []
+        if time.time() > timeout:
+            print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+            break
         for j in range(r):
             if j not in block_track and distance_matrix[i][j] != 0 and q_track + q_array[j] < Q and tau[i][j] >= 0:
                 nij = 1 / distance_matrix[i][j]
@@ -85,6 +89,7 @@ def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, 
                 InBase = True
             block_track.append(value)
             i = dict[interval]
+
 
     return track, block_track
 
@@ -124,6 +129,13 @@ def put_route(r):
         c+=1
     return array
 
+def check_route2(route, all_route):
+    new_route = []
+    for i in range(0, len(route)):
+        for j in range(0, len(route[i])):
+            new_route.append(route[i][j])
+    return list(set(all_route) - set(new_route))
+
 def AntAlgorithm2(q_array, distance_matrix, r, Q):
     tau = fill_tau_matrix(r)
     alpha = 1
@@ -131,20 +143,26 @@ def AntAlgorithm2(q_array, distance_matrix, r, Q):
     block_track = []
     p = 0.01
     Q_ant = 0.01
-    #tracks = ClarkeWrightMethod(q_array, distance_matrix, r, Q)
-    #tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
-    tracks = []
+
     all_route = put_route(r)
 
-    while len(block_track) < r:
-        track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
+    tracks = ClarkeWrightMethod(q_array, distance_matrix, r, Q)
+    tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
+    tracks = []
+    all_route = put_route(r)
+    timeout = time.time() + 10
+    while len(block_track) < r and not (time.time() > timeout):
+        track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q, timeout)
         tracks.append(track[0])
     tracks = []
-    for i in range(1000):
-        tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
+    for i in range(2000):
+        if time.time() < timeout:
+            tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
         block_track = []
         tracks = []
-        while len(block_track) < r:
-            track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
+        print(i)
+        timeout = time.time() + 10
+        while len(block_track) < r and not (time.time() > timeout):
+            track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q, timeout)
             tracks.append(track[0])
     return tracks

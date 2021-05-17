@@ -1,5 +1,6 @@
 import ParseFromExel
 import random
+import time
 
 
 def print_matrix(matrix):
@@ -50,7 +51,7 @@ def find_random_in_array(array, x):
     return len(array) - 1
 
 
-def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q):
+def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q, timeout):
     q_track = 0
     hasSpace = True
     i = 0
@@ -80,6 +81,8 @@ def loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, 
             track.append(value)
             block_track.append(value)
             i = dict[interval]
+        if time.time() > timeout:
+            break
 
     track.append(0)
     return track, block_track
@@ -119,16 +122,19 @@ def AntAlgorithm(q_array, distance_matrix, r, Q):
     p = 0.01
     Q_ant = 0.01
 
-    while len(block_track) < r:
-        track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
+    timeout = time.time() + 10
+    while len(block_track) < r and not (time.time() > timeout):
+        track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q, timeout)
         tracks.append(track[0])
 
-    for i in range(1000):
-        print(i)
-        tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
+    for i in range(2000):
+        if time.time() < timeout:
+            tau = update_tau(tau, tracks, r, Q_ant, p, distance_matrix)
         block_track = [0]
         tracks = []
-        while len(block_track) < r:
-            track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q)
+        print(i)
+        timeout = time.time() + 10
+        while len(block_track) < r and not (time.time() > timeout):
+            track = loop_for_track(alpha, betta, distance_matrix, tau, block_track, q_array, r, Q, timeout)
             tracks.append(track[0])
     return tracks
